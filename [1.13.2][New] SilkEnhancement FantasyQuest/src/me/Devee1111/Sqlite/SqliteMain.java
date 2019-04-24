@@ -77,6 +77,8 @@ public class SqliteMain {
 			stat.setString(5, type);
 			stat.setString(6, uuid);
 			stat.executeUpdate();
+			conn.close();
+			stat.close();
 		} catch (SQLException ex) {
 			inst.getLogger().log(Level.SEVERE, "[SilkEnhancement] Error adjusting the SQL database!");
 			inst.getLogger().log(Level.SEVERE,"[SilkEnhancement] A error fatal has occured, and the plugin will not work as expected.");
@@ -98,6 +100,8 @@ public class SqliteMain {
 			stat.setString(5, type);
 			stat.setString(6, uuid);
 			stat.executeUpdate();
+			conn.close();
+			stat.close();
 		} catch (SQLException ex) {
 			inst.getLogger().log(Level.SEVERE, "[SilkEnhancement] Error adjusting the SQL database!");
 			inst.getLogger().log(Level.SEVERE,"[SilkEnhancement] A error fatal has occured, and the plugin will not work as expected.");
@@ -131,7 +135,6 @@ public class SqliteMain {
 		} finally {
 			try {
 				if (conn != null) {
-					//Making sure we're good datatable wise
 					createNewTable();
 					conn.close();
 				}
@@ -152,13 +155,17 @@ public class SqliteMain {
 				+ "world text NOT NULL,"
 				+ "x integer NOT NULL,"
 				+ "y integer NOT NULL,"
+				+ "z integer NOT NULL,"
 				+ "type text NOT NULL,"
-				+ "player text NOT NULL"
+				+ "player text NOT NULL,"
 				+ "capacity real);";
 		try {
 			Connection conn = DriverManager.getConnection(url);
 			Statement stat = conn.createStatement();
 			stat.execute(sql);
+			//relasing our sql stuff back to be used again.
+			conn.close();
+			stat.close();
 		} catch(SQLException ex) {
 			inst.getLogger().log(Level.SEVERE, "[SilkEnhancement] An error has occured while adjusting the database!");
 			inst.getLogger().log(Level.SEVERE,"[SilkEnhancement] A fatal has occured, and the plugin will not work as expected.");
