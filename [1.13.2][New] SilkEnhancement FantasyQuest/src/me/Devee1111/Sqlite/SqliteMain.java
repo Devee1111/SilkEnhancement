@@ -151,19 +151,18 @@ public class SqliteMain {
 		String url = "jdbc:sqlite:"+inst.getDataFolder().getAbsolutePath()+"/placed.db";
 		//Our actual request to server
 		String sql = "CREATE TABLE IF NOT EXISTS placed ("
-				+ "id integer PRIMARY KEY,"
+			//	+ "id integer PRIMARY KEY,"
 				+ "world text NOT NULL,"
 				+ "x integer NOT NULL,"
 				+ "y integer NOT NULL,"
 				+ "z integer NOT NULL,"
 				+ "type text NOT NULL,"
-				+ "player text NOT NULL,"
-				+ "capacity real);";
+				+ "player text NOT NULL);";
 		try {
 			Connection conn = DriverManager.getConnection(url);
 			Statement stat = conn.createStatement();
 			stat.execute(sql);
-			//relasing our sql stuff back to be used again.
+			//releasing our sql stuff back to be used again.
 			conn.close();
 			stat.close();
 		} catch(SQLException ex) {
