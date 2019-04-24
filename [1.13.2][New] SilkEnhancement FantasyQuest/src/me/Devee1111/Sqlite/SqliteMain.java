@@ -35,14 +35,25 @@ public class SqliteMain {
 		return conn;
 	}
 	
-	/*
-	 * 
-	 * 
-	 * Make constructer that returns if something exists in the file 
-	 * 
-	 * 
-	 */
 	
+	//Beginnings of checking if data exists method
+	public static boolean checkData(Block block, String uuid) {
+		boolean exists = false;
+		String sql = "";
+		
+		try {
+			Connection conn = connect();
+			conn.prepareStatement(sql);
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+		}
+		return exists;
+	}
+	
+	
+	/*
+	 * Needs testing.
+	 */
 	
 	public static void removeData(Block block, String type, String uuid) {
 		//Maybe works
