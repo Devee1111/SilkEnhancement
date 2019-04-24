@@ -1,0 +1,11 @@
+#Do not touch this
+version: 1.0
+options:
+  prefix: "&8(&3Spawners&8)"
+  #If enabled, will log useful information to conosole, if desired you can change the level by adding level: INFO/WARNING/SEVERE
+  debug: false
+    #level: 'INFO'
+messages:
+  nopermission: 'You do not have permission to do this.'
+  reloadedConfig: '%prefix% &aYou have reloaded the configuration.'
+  

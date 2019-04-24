@@ -1,0 +1,26 @@
+name: SilkEnhancement
+main: me.Devee1111.SilkEnhancementMain
+version: 1.0
+api-version: 1.13
+depends: [SilkSpawners]
+author: [Devee1111]
+commands:
+  sereload:
+    aliases: [ser]
+    description: reload the config.
+    usage: /<command>
+  sedebug:
+    aliases: [sed]
+    description: Enable/disable debug in config.
+    usage: /<command> <level> <> = optional.
+permissions:
+  se.admin:
+    default: op
+    children:
+      se.reload: true
+  se.reload:
+    default: op
+    description: Access to /sereload
+  se.debug:
+    default: op
+    description: access to /sedebug
