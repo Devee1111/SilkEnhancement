@@ -131,6 +131,8 @@ public class SqliteMain {
 		} finally {
 			try {
 				if (conn != null) {
+					//Making sure we're good datatable wise
+					createNewTable();
 					conn.close();
 				}
 			} catch (SQLException ex) {
@@ -139,9 +141,6 @@ public class SqliteMain {
 				ex.printStackTrace();
 			}
 		}
-		
-		//Making sure we're good datatable wise
-		createNewTable();
 	}
 	
 	public static void createNewTable() {
