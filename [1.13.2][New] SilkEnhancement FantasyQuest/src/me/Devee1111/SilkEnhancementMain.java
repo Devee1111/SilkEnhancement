@@ -57,32 +57,7 @@ public class SilkEnhancementMain extends JavaPlugin {
 		
 	}
 	
-	/*
-	 * SQL stuff
-	 */
-	public void connect() {
-		Connection conn = null;
-		try {
-			String url = "jdbc:sqlite:"+getDataFolder().getAbsolutePath()+"/placed.db";
-			conn = DriverManager.getConnection(url);
-			getLogger().log(Level.INFO,"Connection to SQL database has been established.");
-			
-		} catch (SQLException ex) {
-			getLogger().log(Level.SEVERE, "Error connecting to SQL database!");
-			getLogger().log(Level.SEVERE,"A fatal has occured, and the plugin will not work as expected.");
-			ex.printStackTrace();
-		} finally {
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException ex) {
-				getLogger().log(Level.SEVERE, "An error has occured while closing connection to the SQL database!");
-				getLogger().log(Level.SEVERE,"A fatal has occured, and the plugin will not work as expected.");
-				ex.printStackTrace();
-			}
-		}
-	}
+	
 	
 	//Mkaing sure the actual file exists
 	public void createPlacementFile() {

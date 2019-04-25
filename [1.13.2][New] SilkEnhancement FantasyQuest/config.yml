@@ -1,11 +1,349 @@
-#Do not touch this
+#Do not touch this, this is my fish.
 version: 1.0
+#Configure how the plugin works
 options:
   prefix: "&8(&3Spawners&8)"
   #If enabled, will log useful information to conosole, if desired you can change the level by adding level: INFO/WARNING/SEVERE
   debug: false
-    #level: 'INFO'
+  #level: 'INFO'
+  #How we handle spawners that aren't listed in the config
+  chargeForUnknown:
+  #Do we charge for an unknown spawner?
+    enabled: false
+    #What we charge, if so
+    price: 50000
+    #If the spawner isn't in the configuration, but is known to be placed, do we still charge?
+    evenIfPlaced: false
+  #Do we charge them even if it's placed (Bought)?
+  chargeForPlaced: false
+   #If the above is true, do we check and see if they have a discount and give it to them? permission: se.placed.discount.(percentnode) or se.discount.custom.name
+  discountForPlaced: false
+  #Do we charge for natural spawners being mined?
+  chargeForNatural: true
+  #If chargeForNatural is false, do we give them a discount for natural?
+  discountForNatural: true
+  #These nodes are checked for the player when checking discount, they allow a custom number to be passed in (if it exeeds 100, it will still cost 0)
+  #If it's a whole number, normal nodes can do this already.
+  discountNodes:
+    custom: 33.33
+  #These are the default prices for naturally found spawners, for defualt generations they are: Blaze, Silverfish, Skeleton, Zombie, Spider, Cave_Spider
+  naturalPrices:
+    Blaze: 500000
+    Skeleton: 80000
+    Silverfish: 100000
+    Zombie: 80000
+    Spider: 80000
+    Cave_Spider: 80000
+  #All working mobs listed below 
+  #Creeper, skeleton, Spider, Zombie, Slime(In chunks only)(Doesn't work with older Holographicdisplay plugins)
+  #ghast(Is glitchy often), pigZombie, enderman, cavespider, silverfish, Witch, endermite, guardian, shulker
+  #Blaze, Lavaslime(Doesn't work with older Holographicdisplay plugins), bat. 
+  #All others can be defined, but rarely would be used and will most likely cause frustration.
+  placedPrices:
+    #Beep beep I'm a sheep
+    Sheep: 3000
+    Pig: 5000
+  
+  
+  
+#Messages displayed throughout the plugin, all messages support the %prefix% placeholder.
 messages:
   nopermission: 'You do not have permission to do this.'
   reloadedConfig: '%prefix% &aYou have reloaded the configuration.'
   
+#Be careful with this section please. It uses the EXACT entity name to produce easier names for mobs
+#MOB NAMES (NOT ALL HAVE SPAWNERS KEEP TH AT IN MIND, BUT IF YOU ADD IT ANYWAYS IT WONT CAUSE ERROR IT WILL JUST NEVER BE SEEN) -https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html 
+#leave it in all lowercase, the plugin will try to take the name and put it to lowercase for checking  
+#Don't worry about underscores "_" in names section, plugin will replace spaces with _ while checking!
+#Also don't worry about not spaced versioned of the name, the plugin will also try to check with non spaced of names given
+aliases:
+  BAT:
+    names:
+      - 'bat'
+      - 'sky dog'
+      - 'vampires'
+    preferredname: 'Bat'
+  BLAZE:
+    names:
+      - 'blaze'
+    preferredname: 'Blaze'
+  CAT:
+    names:
+      - 'cat'
+      - 'kitty'
+      - 'cade'
+      - 'kitty kat'
+      - 'kat'
+    preferredname: 'Cat'
+  CAVE_SPIDER:
+    names:
+      - 'cave spider'
+      - 'small spider'
+      - 'poisen spider'
+    preferredname: 'Cave Spider'
+  CHICKEN:
+    names:
+      - 'chick'
+      - 'chicky'
+      - 'chicken'
+      - 'chucken'
+      - 'rooster'
+    preferredname: 'Chicken'
+  COD:
+    names:
+      - 'cod'
+    preferredname: 'Cod'
+  COW:
+    names:
+      - 'moo moo'
+      - 'cow'
+    preferredname: 'Cow'
+  CREEPER:
+    names:
+      - 'creeper'
+      - 'creep'
+      - 'creepy'
+      - 'stalker'
+    preferredname: 'Creeper'
+  DOLPHIN:
+    names:
+      - 'dolphin'
+      - 'sea puppy'
+      - 'dol'
+      - 'perfection'
+    preferredname: 'Dolphin'
+  DONKEY:
+    names:
+      - 'donkey'
+      - 'jackass'
+      - 'ass'
+      - 'donk'
+    preferredname: 'Donkey'
+  DROWNED:
+    names:
+      - 'drowned'
+    preferredname: 'Drowned'
+  ELDER_GUARDIAN:
+    names:
+      - 'elder guardian'
+      - 'eg'
+      - 'elder guard'
+    preferredname: 'Elder Guardian'
+  ENDERMAN:
+    names:
+      - 'ender man'
+      - 'ender'
+      - 'ender guy'
+    preferredname: 'enderman'
+  ENDERMITE:
+    names:
+      - 'ender mite'
+      - 'em'
+      - 'end mite'
+    preferredname: 'Endermite'
+  EVOKER:
+    names: 
+      - 'evoker'
+    preferredname: 'Evoker'
+  GHAST:
+    names:
+      - 'ghast'
+      - 'screamer'
+      - 'ghost'
+    preferredname: 'Ghast'
+  GIANT:
+    names:
+      - 'giant'
+    preferredname: 'Giant'
+  GUARDIAN:
+    names:
+      - 'guardian'
+      - 'guard'
+    preferredname: 'Guardian'
+  HORSE:
+    names:
+      - 'horse'
+      - 'horsey'
+      - 'pony'
+    preferredname: 'Horse'
+  HUSK:
+    names:
+      - 'husk'
+      - 'sand zombie'
+    preferredname: 'Husk'
+  ILLUSIONER:
+    names:
+      - 'illusioner'
+    preferredname: 'Illusioner'
+  IRON_GOLEM:
+    names:
+      - 'ig'
+      - 'iron golem'
+      - 'iron gol'
+      - 'villager golem'
+      - 'vill gol'
+    preferredname: 'Iron Golem'  
+  LLAMA:
+    names:
+      - 'llama'
+      - 'lama'
+      - 'lana'
+    preferredname: 'Llama'
+  MAGMA_CUBE:
+    names:
+      - 'magma cube'
+      - 'lava slime'
+      - 'magma slime'
+    preferredname: 'Magma Cube'
+  MULE:
+    names:
+      - 'mule'
+    preferredname: 'Mule'
+  MUSHROOM_COW:
+    names:
+      - 'moo shroom'
+      - 'mushroom cow'
+    preferredname: 'Mooshroom'
+  OCELOT:
+    names:
+      - 'ocelot'
+      - 'wild cat'
+      - 'wild kitty'
+      - 'forbidden cat'
+    preferredname: 'Ocelot'
+  PARROT:
+    names:
+      - 'parrot'
+      - 'bird'
+      - 'birdy'
+    preferredname: 'Parrot'
+  PHANTOM:
+    names:
+      - 'phantom'
+      - 'nightmares'
+    preferredname: 'Phantom'
+  PIG:
+    names:
+      - 'pig'
+      - 'piggy'
+      - 'bacon'
+      - 'sir piggles'
+      - 'piggles'
+    preferredname: 'Pig'
+  PIG_ZOMBIE:
+    names:
+      - 'pig zombie'
+      - 'pig zom'
+      - 'zom pig'
+      - 'zombie pig'
+    preferredname: 'Pig Zombie'
+  POLAR_BEAR:
+    names:
+      - 'polar bear'
+      - 'bear'
+    preferredname: 'Polar Bear'
+  RABBIT:
+    names:
+      - 'rabbit'
+      - 'bunny'
+      - 'jumper'
+    preferredname: 'Rabbit'
+  SHEEP:
+    names:
+      - 'sheep'
+      - 'sheepy'
+      - 'beep beep im a sheep'
+    preferredname: 'Sheep'
+  SHULKER:
+    names:
+      - 'shulker'
+      - 'shulk'
+      - 'shulky'
+    preferredname: 'Shulker'
+  SILVERFISH:
+    names:
+      - 'silver fish'
+    preferredname: 'Silverfish'
+  SKELETON:
+    names:
+      - 'skeleton'
+      - 'skelly'
+      - 'skel'
+    preferredname: 'Skeleton'
+  SKELETON_HORSE:
+    names:
+      - 'skeleton horse'
+    perferredname: 'Skeleton Horse'
+  SLIME:
+    names:
+      - 'slime'
+      - 'slimey'
+    preferredname: 'Slime'
+  SPIDER:
+    names:
+      - 'spider'
+      - 'spidey'
+      - 'spooder'
+    preferredname: 'Spider'
+  SQUID:
+    names:
+      - 'squid'
+    preferredname: 'Squid'
+  TURTLE:
+    names:
+      - 'turtle'
+    preferredname: 'Turtle'
+  VEX:
+    names:
+      - 'vex'
+    preferredname: 'Vex'
+  VILLAGER:
+    names:
+      - 'villager'
+    preferredname: 'Villager'
+  VINDICATOR:
+    names:
+      - 'vindicator'
+    preferredname: 'vindicator'
+  WITCH:
+    names:
+      - 'witch'
+      - 'wizard'
+    preferredname: 'Witch'
+  WITHER:
+    names:
+      - 'wither'
+    preferredname: 'Wither'
+  WITHER_SKELETON:
+    names:
+      - 'wither skeleton'
+      - 'skeleton wither'
+    preferredname: 'Wither Skeleton'
+  WOLF:
+    names:
+      - 'wolf'
+      - 'dog'
+      - 'puppy'
+      - 'pupper'
+      - 'dire wolf'
+      - 'mutt'
+      - 'doggy'
+    preferredname: 'Wolf'
+  ZOMBIE:
+    names:
+      - 'zombie'
+      - 'zomber'
+      - 'zom zom'
+      - 'undead'
+    preferredname: 'Zombie'
+  ZOMBIE_HORSE:
+    names:
+      - 'zombie horse'
+      - 'horse zombie'
+      - 'zomzom horse'
+    preferredname: 'Zombie Horse'
+  ZOMBIE_VILLAGER:
+    names: 
+      - 'zombie villager'
+    preferredname: 'Zombie Villager'
+    
