@@ -1,12 +1,6 @@
 package me.Devee1111;
 
 
-
-import java.io.File;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
@@ -48,22 +42,7 @@ public class SilkEnhancementMain extends JavaPlugin {
 		
 	}
 	
-	
-	
-	//Mkaing sure the actual file exists
-	public void createPlacementFile() {
-		File placedFile = new File(getDataFolder().getAbsolutePath()+"+placed.db");
-		if(!placedFile.exists() == false) {
-			try {
-				placedFile.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		
-	}
-	
-	
+	//Core commands that are vital to use, therefore are stored on the main thread.	
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(cmd.getName().equalsIgnoreCase("sereload")) {
 			if(sender.hasPermission("se.reload")) {
@@ -89,7 +68,12 @@ public class SilkEnhancementMain extends JavaPlugin {
 		}
 		return false;
 	}
-	 
+	
+	/*
+	 * Messaging system - complete
+	 */
+	
+	//Most messages don't have anything more than the %prefix% placeholder, making this useful.
 	public void sendMessage(CommandSender sender, String path) {
 		//If check to make no permission sends easier
 		if(path.equalsIgnoreCase("nopermission")) {
@@ -101,6 +85,64 @@ public class SilkEnhancementMain extends JavaPlugin {
 		tosend = ChatColor.translateAlternateColorCodes('&', tosend);
 		sender.sendMessage(tosend);
 	}
+	//Used to color a given string (change color codes), often used after createmessage 
+	public String color(String tosend) {
+		tosend = ChatColor.translateAlternateColorCodes('&', tosend);
+		return tosend;
+	}
+	//If a message calls for more than one placeholder, we can this method instead to start it off, and then add them
+	public String createMessage(String path) {
+		String tosend = config.getString(path);
+		tosend = tosend.replace("%prefix", config.getString("options.prefix"));
+		return tosend;
+	}
+	//Method that extends the capability of creating messages, allowing for a boolean that says if needs to make a non configged message 
+	public String createMessage(String message, boolean isConfig) {
+		if(isConfig == false) {
+			String tosend = message;
+			if(config.contains("options.prefix")) {
+				tosend = tosend.replace("%prefix%", config.getString("options.debug"));
+			} else {
+				tosend = tosend.replace("%prefix%", "&8(&3Spawners&8)");
+			}
+			return message;
+		} else {
+			String tosend = config.getString(message); 
+			return tosend;
+		}
+	}
+	
+	/*
+	 * onEnable methods - complete
+	 */
+	
+	//it setups up the instance of the main class for getInstance to give.
+	public void setInstance(SilkEnhancementMain instance) {
+		SilkEnhancementMain.instance = instance;
+	}
+	/*needs work*/
+	public void loadConfig() {
+		saveDefaultConfig();
+		
+		/*Section that's not working, vital*/ 
+		//Getting our default configuration
+/*		InputStream in = getResource("config.yml");
+		InputStreamReader isr = new InputStreamReader(in);
+		YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(isr);
+		//If theres a new version of the config, save it.
+		if(config.getDouble("version") != defaultConfig.getDouble("version")) {
+			saveResource("config.yml",true);
+		}*/
+		
+		//Setting our config for the plugin 
+		config = getConfig();
+	}
+	
+	/*
+	 * Assisting system - incomplete
+	 */
+	
+	//It's not uncommon for use to enable/disable debug, so we have this to manage it, and to allow other classes an easier time
 	public void debug(String message) {
 		if(config.getBoolean("options.debug") == true) {
 			Level desire = Level.INFO;
@@ -113,50 +155,24 @@ public class SilkEnhancementMain extends JavaPlugin {
 			getLogger().log(desire,message);
 		}
 	}
+	//Our instance, retrieved from other classes to access our methods
 	public static SilkEnhancementMain getInstance() {
 		return instance;
 	}	
-	public void setInstance(SilkEnhancementMain instance) {
-		SilkEnhancementMain.instance = instance;
-	}
+	/*At the moment they're not needed, but in the future, it will perform checks on the changes and then fix them before they're permanent. */
+	//Saves config to disk
 	public void saveConfiguration() {
 		saveConfig();
 	}
+	//Reloads the config
 	public void reloadConfiguration() {
 		reloadConfig();
 	}
-	/*
-	 * needs work
-	 */
-	public void loadConfig() {
-		//If file doesn't exist, make one
-		saveDefaultConfig();
-		//Getting our default configuration
-//		InputStream in = getResource("config.yml");
-//		InputStreamReader isr = new InputStreamReader(in);
-//		YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(isr);
-		//If theres a new version of the config, save it.
-//		if(config.getDouble("version") != defaultConfig.getDouble("version")) {
-//			saveResource("config.yml",true);
-//		}
-		//Setting our config 
-		config = getConfig();
-	}
-	public String color(String tosend) {
-		tosend = ChatColor.translateAlternateColorCodes('&', tosend);
-		return tosend;
-	}
-	public String createMessage(String path) {
-		String tosend = config.getString(path);
-		tosend = tosend.replace("%prefix", config.getString("options.prefix"));
-		return tosend;
-	}
-	
+	//This is used to log information to console, for general uses
 	public void log(String message) {
 		getLogger().log(Level.WARNING,message);
 	}
-	
-	//causes error, nullpointer for some reason
+	/*Not working, causes nullpointerexception when used with others exceptions*/
 	public void error(Exception e) {
 		getLogger().log(Level.WARNING,"################################################");
 		getLogger().log(Level.WARNING,"# An error has occured withen SilkEnhancement! #");
@@ -166,19 +182,5 @@ public class SilkEnhancementMain extends JavaPlugin {
 		getLogger().log(Level.WARNING,"#                 >Stacktrace<                 #");
 		e.printStackTrace();
 		getLogger().log(Level.WARNING,"################################################");
-	}
-	public String createMessage(String message, boolean isConfig) {
-		if(isConfig == false) {
-			String tosend = message;
-			if(config.contains("options.prefix")) {
-				tosend = tosend.replace("%prefix%", config.getString("options.debug"));
-			} else {
-				tosend = tosend.replace("%prefix%", "&8(&3Spawners&8)");
-			}
-			return message;
-		} else {
-			String tosend = createMessage(message); 
-			return tosend;
-		}
 	}
 }
