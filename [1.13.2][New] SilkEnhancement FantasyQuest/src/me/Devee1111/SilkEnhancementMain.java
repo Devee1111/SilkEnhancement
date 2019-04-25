@@ -29,10 +29,8 @@ public class SilkEnhancementMain extends JavaPlugin {
 		//Create instance of our main class for other classes
 		setInstance(this);
 		
-		
 		//Load configuration for use // manages default
 		loadConfig();
-		
 		
 		//This Listener will listen to spawner placements // minings for our placed file
 		new SilkEnhancementListenerPlacement(this);
@@ -40,13 +38,8 @@ public class SilkEnhancementMain extends JavaPlugin {
 		//Making our command classes 
 		getCommand("secheck").setExecutor(new SilkEnhancementCommandCheck(this));
 		
-		//connect
+		//Getting our SQL ready
 		SqliteMain.loadSqlFile();
-		
-		
-		
-		
-		
 	}
 
 	
@@ -111,7 +104,7 @@ public class SilkEnhancementMain extends JavaPlugin {
 	public void debug(String message) {
 		if(config.getBoolean("options.debug") == true) {
 			Level desire = Level.INFO;
-			if(config.contains("options.debug.level")) {
+			if(config.contains("options.level")) {
 				desire = Level.parse(config.getString("options.debug.level"));
 				if(desire == null) {
 					desire = Level.INFO;

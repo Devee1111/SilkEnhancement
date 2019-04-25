@@ -9,9 +9,16 @@ import me.Devee1111.Aliases.AliasesMain;
 public class SilkEnhancementCommandCheck implements CommandExecutor {
 
 	
+	//Making our main class var for use of our main class
 	private SilkEnhancementMain inst = SilkEnhancementMain.getInstance();
 	
-	
+	//Making our instance
+	public SilkEnhancementMain instance;
+	public SilkEnhancementCommandCheck(SilkEnhancementMain instance) {
+	  this.instance = instance;
+	}
+
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		
