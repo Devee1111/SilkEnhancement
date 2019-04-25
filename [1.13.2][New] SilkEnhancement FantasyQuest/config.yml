@@ -50,6 +50,8 @@ options:
 messages:
   nopermission: 'You do not have permission to do this.'
   reloadedConfig: '%prefix% &aYou have reloaded the configuration.'
+  checkFailure: '%prefix% &bAliases &care listed wrong, please check errors.'
+  checkSuccess: '%prefix% &bAliases &aare listed correctly.'
   
 #Be careful with this section please. It uses the EXACT entity name to produce easier names for mobs
 #MOB NAMES (NOT ALL HAVE SPAWNERS KEEP TH AT IN MIND, BUT IF YOU ADD IT ANYWAYS IT WONT CAUSE ERROR IT WILL JUST NEVER BE SEEN) -https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html 

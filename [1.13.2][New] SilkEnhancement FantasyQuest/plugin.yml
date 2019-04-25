@@ -13,14 +13,23 @@ commands:
     aliases: [sed]
     description: Enable/disable debug in config.
     usage: /<command> <level> <> = optional.
+  secheck:
+    aliases: [check]
+    description: Checks if the aliases portion of config is working.
+    usage: /<commnad>
 permissions:
   se.admin:
     default: op
     children:
       se.reload: true
+      se.debug: true
+      se.command.check: true
   se.reload:
     default: op
     description: Access to /sereload
   se.debug:
     default: op
     description: access to /sedebug
+  se.command.check:
+    default: op
+    description: access to /secheck

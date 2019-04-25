@@ -37,10 +37,8 @@ public class SilkEnhancementMain extends JavaPlugin {
 		//This Listener will listen to spawner placements // minings for our placed file
 		new SilkEnhancementListenerPlacement(this);
 		
-		
-		//Here is what's working and connecting
-		/*Removed as loadSqlFile() does this now*/
-		//createPlacementFile();
+		//Making our command classes 
+		getCommand("secheck").setExecutor(new SilkEnhancementCommandCheck(this));
 		
 		//connect
 		SqliteMain.loadSqlFile();
@@ -100,6 +98,10 @@ public class SilkEnhancementMain extends JavaPlugin {
 	}
 	 
 	public void sendMessage(CommandSender sender, String path) {
+		//If check to make no permission sends easier
+		if(path.equalsIgnoreCase("nopermission")) {
+			path = "messages.nopermission";
+		}
 		String tosend = config.getString(path);
 		tosend = tosend.replace("%prefix%", config.getString("options.prefix"));
 		tosend = tosend.replace("%player%", sender.getName());
