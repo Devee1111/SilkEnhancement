@@ -1,12 +1,16 @@
 package me.Devee1111;
 
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import me.Devee1111.Sqlite.SqliteMain;
@@ -26,8 +30,9 @@ public class SilkEnhancementMain extends JavaPlugin {
 		//Load configuration for use // manages default
 		loadConfig();
 		
-		//This Listener will listen to spawner placements // minings for our placed file
+		//Making our Listener classes
 		new SilkEnhancementListenerPlacement(this);
+		new SilkEnhancementListenerDebug(this);
 		
 		//Making our command classes 
 		getCommand("secheck").setExecutor(new SilkEnhancementCommandCheck(this));
@@ -46,7 +51,7 @@ public class SilkEnhancementMain extends JavaPlugin {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(cmd.getName().equalsIgnoreCase("sereload")) {
 			if(sender.hasPermission("se.reload")) {
-				reloadConfig();
+				reloadConfiguration();
 				sendMessage(sender, "messages.reloadedConfig");
 				return true;
 			}
@@ -85,7 +90,7 @@ public class SilkEnhancementMain extends JavaPlugin {
 		tosend = ChatColor.translateAlternateColorCodes('&', tosend);
 		sender.sendMessage(tosend);
 	}
-	//Used to color a given string (change color codes), often used after createmessage 
+	//Used to color a given string (change color codes), often used after createmessage EX: inst.color(createmessage(path).replacePlaceholders); 
 	public String color(String tosend) {
 		tosend = ChatColor.translateAlternateColorCodes('&', tosend);
 		return tosend;
@@ -120,22 +125,32 @@ public class SilkEnhancementMain extends JavaPlugin {
 	public void setInstance(SilkEnhancementMain instance) {
 		SilkEnhancementMain.instance = instance;
 	}
-	/*needs work*/
+	//Makes sure everything config related is good to go
 	public void loadConfig() {
+		//Making sure we have a config, if one doesn't exist, it's created
 		saveDefaultConfig();
-		
-		/*Section that's not working, vital*/ 
-		//Getting our default configuration
-/*		InputStream in = getResource("config.yml");
-		InputStreamReader isr = new InputStreamReader(in);
-		YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(isr);
-		//If theres a new version of the config, save it.
-		if(config.getDouble("version") != defaultConfig.getDouble("version")) {
-			saveResource("config.yml",true);
-		}*/
-		
-		//Setting our config for the plugin 
+		//Setting our config
 		config = getConfig();
+		//Option that allows for a config reset whithout deleting, useful I guess
+		if(!config.contains("options.resetConfig")) {
+			config.set("options.resetConfig", false);
+			saveConfig();
+		}
+		if(config.getBoolean("options.resetConfig") == true) {
+			saveResource("config.yml", true);
+		}
+		//Getting our default configuration
+		InputStream in = getResource("config.yml");
+		InputStreamReader isr = new InputStreamReader(in);
+		FileConfiguration defaultConfig = YamlConfiguration.loadConfiguration(isr);
+		//If theres a new version of the config, save it.
+		if(config.contains("version")) {
+			if(config.getDouble("version") != defaultConfig.getDouble("version")) {
+				saveResource("config.yml",true);
+			}
+		} else { //They touched my fish, RESET THE CONFIG!
+			saveResource("config.yml", true);
+		}
 	}
 	
 	/*
@@ -147,12 +162,35 @@ public class SilkEnhancementMain extends JavaPlugin {
 		if(config.getBoolean("options.debug") == true) {
 			Level desire = Level.INFO;
 			if(config.contains("options.level")) {
-				desire = Level.parse(config.getString("options.debug.level"));
-				if(desire == null) {
-					desire = Level.INFO;
-				}
+				try { 
+					desire = Level.parse(config.getString("options.debug.level"));
+				} catch (Exception e) {/*Don't care it failed, yet*/}
 			}
 			getLogger().log(desire,message);
+		}
+	}
+	/*this allows us to send debug messages to players with options and all the works.*/
+	public void debug(String message,Player p) {
+		//generally for optimization we check this before it's called, but this allows random calls to be made safely
+		if(config.getBoolean("options.debug") == true) {
+			if(p.hasPermission("se.debug")) {
+				//Prefixing the message
+				if(config.contains("options.prefix")) {
+					//Making sure if a space is needed after prefix, it's added
+					String spaceadjust = "";
+					if(!config.getString("options.prefix").endsWith(" ")) {
+						spaceadjust = " ";
+					}
+					message = config.getString("options.prefix")+ spaceadjust +"&b"+ message;
+				}
+				//setting default color for the messages
+				message = message.replace("=", "&7=");
+				//sending message
+				p.sendMessage(color(message));
+				//Logging to console, and alerting of the player
+				debug(p.getName() + " - " + message);
+			}
+			
 		}
 	}
 	//Our instance, retrieved from other classes to access our methods
@@ -166,6 +204,10 @@ public class SilkEnhancementMain extends JavaPlugin {
 	}
 	//Reloads the config
 	public void reloadConfiguration() {
+		if(config.getBoolean("options.resetConfig") == true) {
+			saveResource("config.yml", true);
+		}
+		
 		reloadConfig();
 	}
 	//This is used to log information to console, for general uses

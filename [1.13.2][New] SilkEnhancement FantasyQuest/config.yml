@@ -5,7 +5,9 @@ options:
   prefix: "&8(&3Spawners&8)"
   #If enabled, will log useful information to conosole, if desired you can change the level by adding level: INFO/WARNING/SEVERE
   debug: false
-  #level: 'INFO'
+  level: 'INFO'
+  #When set to true, the config will revert back to the default on next restart or reload.
+  resetConfig: false
   #How we handle spawners that aren't listed in the config
   chargeForUnknown:
   #Do we charge for an unknown spawner?
@@ -50,6 +52,7 @@ options:
 messages:
   nopermission: 'You do not have permission to do this.'
   reloadedConfig: '%prefix% &aYou have reloaded the configuration.'
+  debugWarning: '%prefix% &cWARNING! &bDebug mode is enabled, this will cause spam. Disable with /sedebug'
   checkFailure: '%prefix% &bAliases &care listed wrong, please check errors.'
   checkSuccess: '%prefix% &bAliases &aare listed correctly.'
   
@@ -69,14 +72,14 @@ aliases:
     names:
       - 'blaze'
     preferredname: 'Blaze'
-  CAT:
-    names:
-      - 'cat'
-      - 'kitty'
-      - 'cade'
-      - 'kitty kat'
-      - 'kat'
-    preferredname: 'Cat'
+#  CAT:
+#    names:
+#      - 'cat'
+#      - 'kitty'
+#      - 'cade'
+#      - 'kitty kat'
+#      - 'kat'
+#    preferredname: 'Cat'
   CAVE_SPIDER:
     names:
       - 'cave spider'
@@ -201,11 +204,11 @@ aliases:
     names:
       - 'mule'
     preferredname: 'Mule'
-  MUSHROOM_COW:
-    names:
-      - 'moo shroom'
-      - 'mushroom cow'
-    preferredname: 'Mooshroom'
+#  MUSHROOM_COW:
+#    names:
+#      - 'moo shroom'
+#      - 'mushroom cow'
+#    preferredname: 'Mooshroom'
   OCELOT:
     names:
       - 'ocelot'
@@ -232,13 +235,13 @@ aliases:
       - 'sir piggles'
       - 'piggles'
     preferredname: 'Pig'
-  PIG_ZOMBIE:
-    names:
-      - 'pig zombie'
-      - 'pig zom'
-      - 'zom pig'
-      - 'zombie pig'
-    preferredname: 'Pig Zombie'
+#  PIG_ZOMBIE:
+#    names:
+#      - 'pig zombie'
+#      - 'pig zom'
+#      - 'zom pig'
+#      - 'zombie pig'
+#    preferredname: 'Pig Zombie'
   POLAR_BEAR:
     names:
       - 'polar bear'

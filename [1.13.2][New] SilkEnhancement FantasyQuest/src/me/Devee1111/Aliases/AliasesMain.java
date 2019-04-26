@@ -27,7 +27,6 @@ public class AliasesMain {
 	public static boolean checkIfWorking(CommandSender sender) {
 		boolean working = true; 
 		String currentkey = "";
-		String lastpreferredname = "";
 		try {
 			log("========== START ==========",sender);
 			for(String key : inst.config.getConfigurationSection("aliases").getKeys(false)) {
@@ -36,9 +35,12 @@ public class AliasesMain {
 				log("Entity = "+e.getName(), sender);
 				String names = "none";
 				for(String name : inst.config.getStringList("aliases."+key+".names")) {
+					if(names.equals("none")) {
+						names = "";
+					}
 					names = names + name +", ";
 				}
-				names = names.substring(0, names.length() - 3) + ".";
+				names = names.substring(0, names.length() - 2) + ".";
 				log("Names = "+names,sender);
 				log("Preferred Name = " + inst.config.getString("aliases."+key+".preferredname"),sender);
 				log("--------------------",sender);
@@ -46,15 +48,24 @@ public class AliasesMain {
 			log("========== END ==========",sender);
 		} catch (Exception ex) {
 			log("Failed! Here are the details.",sender);
-			log("Key = " + currentkey,sender);
-			log("Preferredname = " + lastpreferredname,sender);
+			//This is a small check to see if it's not an entity
+			boolean exists = false;
+			try {
+				EntityType e = EntityType.fromName(currentkey);
+				e.getName();
+				exists = true;
+			} catch (Exception e) { /*We don't care it failed the try, this is so the code keeps going. */ }
+			log("EntityExists = "+exists,sender);
+			log("Path = " + "aliases."+currentkey,sender);
+			log("Preferredname = " + inst.config.getString("aliases."+currentkey+".preferredname"),sender);
 			working = false;
+			log("========== END ==========",sender);
 		}
 		return working;
 	}
 	
 	
-	public static void log(String message,CommandSender sender) {
+	private static void log(String message,CommandSender sender) {
 		//Since this is a questionable as they're testing config add a check
 		String prefix = "&8(&3Spawners&8)";
 		if(inst.config.contains("options.prefix")) {

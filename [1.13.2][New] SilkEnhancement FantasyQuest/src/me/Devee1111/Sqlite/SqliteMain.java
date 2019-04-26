@@ -29,6 +29,7 @@ public class SqliteMain {
 	/*
 	 * Used for other classes to get a connection and adjust file as desired.
 	 */
+	
 	public static Connection connect() {
 		String url = "jdbc:sqlite:"+inst.getDataFolder().getAbsolutePath()+"/placed.db";
 		Connection conn = null;
@@ -45,6 +46,7 @@ public class SqliteMain {
 	/*
 	 * This simply checks the database to see if a block is known.
 	 */
+	
 	public static boolean checkData(Block block) {
 		boolean exists = false;
 		String sql = "SELECT * FROM placed WHERE world = ? AND x = ? AND y = ? AND z = ?;";
@@ -76,11 +78,11 @@ public class SqliteMain {
 	 */
 	public static void removeData(Block block) {
 		//We're only deleting if the location is the same, player / type can change without control
-		String sql = "DELETE FROM placed WHERE"
-				+ "world = ?"
-				+ "AND x = ?"
-				+ "AND y = ?"
-				+ "AND z = ?"; 
+		String sql = "DELETE FROM placed WHERE "
+				+ "world = ? "
+				+ "AND x = ? "
+				+ "AND y = ? "
+				+ "AND z = ?;"; 
 		try {
 			Connection conn = connect();
 			PreparedStatement stat = conn.prepareStatement(sql);
@@ -184,7 +186,7 @@ public class SqliteMain {
 			Connection conn = DriverManager.getConnection(url);
 			Statement stat = conn.createStatement();
 			stat.execute(sql);
-			//releasing our sql stuff back to be used again.
+			//releasing our sql from the ram
 			stat.close();
 			conn.close();
 		} catch(SQLException ex) {

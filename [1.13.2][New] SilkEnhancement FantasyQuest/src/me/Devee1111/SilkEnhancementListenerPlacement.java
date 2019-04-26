@@ -1,7 +1,6 @@
 package me.Devee1111;
 
 
-
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
@@ -21,9 +20,11 @@ public class SilkEnhancementListenerPlacement implements Listener {
 	SilkEnhancementMain inst;
 	
 	public SilkEnhancementListenerPlacement(SilkEnhancementMain p) {
+		p.getServer().getPluginManager().registerEvents(this, p);
 		this.inst = p;
 	}
-
+	
+	
 	@EventHandler (priority = EventPriority.MONITOR)
 	public void onSpawnerPlaced(BlockPlaceEvent e) {
 		if(e.isCancelled() == false) {
@@ -47,18 +48,17 @@ public class SilkEnhancementListenerPlacement implements Listener {
 	}
 	
 	
+	/* Handles input from listener and translate it to the sql class for processing */
 	public void sendSql(Player p, Block block, Boolean createIndex) {
 		String uuid = p.getUniqueId().toString();
-		CreatureSpawner spawner = (CreatureSpawner) block;
-		String type = spawner.getType().toString();
+		CreatureSpawner spawner = (CreatureSpawner) block.getState();
+		String type = spawner.getSpawnedType().toString();
 		main.debug(type);
 		if(createIndex == true) {
 			SqliteMain.addData(block, type, uuid);
 		} else {
 			SqliteMain.removeData(block);
 		}
-		
-		
 	}
 
 }
