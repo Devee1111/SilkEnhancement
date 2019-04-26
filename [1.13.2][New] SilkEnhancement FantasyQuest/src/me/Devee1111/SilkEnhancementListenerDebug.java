@@ -19,6 +19,7 @@ public class SilkEnhancementListenerDebug implements Listener {
 		this.instance = p;
 	}
 	
+	
 	/* Gets the entity name for admins to know how to adjust config aliases */	
 	@EventHandler (priority = EventPriority.MONITOR) 
 	public void onEntityHit(EntityDamageByEntityEvent e) {
