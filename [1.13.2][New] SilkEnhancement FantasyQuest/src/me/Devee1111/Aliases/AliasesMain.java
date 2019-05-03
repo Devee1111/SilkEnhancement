@@ -27,6 +27,8 @@ public class AliasesMain {
 	public static double getCost(String type, Block block, Player p) {
 		double cost = 0;
 		
+		inst.log(type);
+		
 		//determing if we're using naturals or not
 		Boolean natural = true;
 		if(SqliteMain.checkData(block) == true) {
@@ -55,10 +57,10 @@ public class AliasesMain {
 		boolean found = false;
 		for(String prices : inst.config.getConfigurationSection(pricepath).getKeys(false)) {
 			if(inst.config.contains("aliases."+type+".names")) {
-				for(String nick : inst.config.getConfigurationSection("aliases."+type+".names").getKeys(false)) {
+				for(String nick : inst.config.getStringList("aliases."+type+".names")) {
 					nick = nick.replace("_", " ");
 					if(nick.equalsIgnoreCase(prices)
-						|| nick.replace(" ", "").equalsIgnoreCase(prices)
+					|| nick.replace(" ", "").equalsIgnoreCase(prices)
 					|| nick.replace(" ", "_").equalsIgnoreCase(prices)) {
 						cost = inst.config.getDouble(pricepath+"."+prices);
 						found = true;
@@ -148,7 +150,7 @@ public class AliasesMain {
 		//We have type, and the area we're going to check analyze!
 		boolean found = false;
 		for(String prices : inst.config.getConfigurationSection(pricepath).getKeys(false)) {
-			for(String nick : inst.config.getConfigurationSection("aliases."+type+".names").getKeys(false)) {
+			for(String nick : inst.config.getStringList("aliases."+type+".names")) {
 				nick = nick.replace("_", " ");
 				if(nick.equalsIgnoreCase(prices)
 				|| nick.replace(" ", "").equalsIgnoreCase(prices)
@@ -232,7 +234,7 @@ public class AliasesMain {
 		}
 		//We have type, and the area we're going to check analyze!
 		for(String prices : inst.config.getConfigurationSection(pricepath).getKeys(false)) {
-			for(String nick : inst.config.getConfigurationSection("aliases."+type+".names").getKeys(false)) {
+			for(String nick : inst.config.getStringList("aliases."+type+".names")) {
 				nick = nick.replace("_", " ");
 				if(nick.equalsIgnoreCase(prices)
 				|| nick.replace(" ", "").equalsIgnoreCase(prices)
