@@ -1,25 +1,40 @@
 package me.Devee1111;
 
 
+import java.io.File;
+//Java imports
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.logging.Level;
-
+//General bukkit immports
 import org.bukkit.ChatColor;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-
+//Sql support import
 import me.Devee1111.Sqlite.SqliteMain;
+import me.Devee1111.Vault.SEVaultMain;
+/*
+ * Our API imports
+ * Economy - https://github.com/MilkBowl/VaultAPI
+ * SilkSpawners - https://dev.bukkit.org/projects/silkspawners/pages/api
+ */
+import de.dustplanet.util.SilkUtil;
+import net.milkbowl.vault.economy.Economy;
 
 
 
 public class SilkEnhancementMain extends JavaPlugin {
 	
 	private static SilkEnhancementMain instance;
+	private static Economy econ = null;
+	private static SilkUtil su = null;
 	public FileConfiguration config;
 	
 	@Override
@@ -27,12 +42,22 @@ public class SilkEnhancementMain extends JavaPlugin {
 		//Create instance of our main class for other classes
 		setInstance(this);
 		
+		//Setting our apis
+		if(!setupEconomy()) {
+			getLogger().log(Level.SEVERE,"[SilkEnhancement] Failed to hook into economy! Plugin will now disable.");
+			getServer().getPluginManager().disablePlugin(this);
+		}
+		
 		//Load configuration for use // manages default
 		loadConfig();
 		
 		//Making our Listener classes
 		new SilkEnhancementListenerPlacement(this);
 		new SilkEnhancementListenerDebug(this);
+		new SilkEnhancementListenerSpawners(this);
+		
+		//hooking into SilkSpawner api
+		su = SilkUtil.hookIntoSilkSpanwers();
 		
 		//Making our command classes 
 		getCommand("secheck").setExecutor(new SilkEnhancementCommandCheck(this));
@@ -59,11 +84,11 @@ public class SilkEnhancementMain extends JavaPlugin {
 		}
 		if(cmd.getName().equalsIgnoreCase("sedebug")) {
 			if(sender.hasPermission("se.debug")) {
-				if(config.getBoolean("debug") == true) {
-					config.set("debug", false);
+				if(config.getBoolean("options.debug") == true) {
+					config.set("options.debug", false);
 					sender.sendMessage(color(createMessage("%prefix% &cYou've disabled debugging!",false)));
 				} else {
-					config.set("debug", true);
+					config.set("options.debug", true);
 					sender.sendMessage(color(createMessage("%prefix% &aYou've enabled debugging!",false)));
 				}
 				saveConfig();
@@ -72,6 +97,32 @@ public class SilkEnhancementMain extends JavaPlugin {
 			sendMessage(sender,"messages.nopermission");
 		}
 		return false;
+	}
+	
+	/*
+	 * This are methods that are used for accessing our api
+	 * Api System - incomplete
+	 */
+	//Sets up the economy api called onenable
+	private boolean setupEconomy() {
+		if(getServer().getPluginManager().getPlugin("Vault") == null) {
+			return false;
+		}
+		RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+		if(rsp == null) {
+			return false;
+		}
+		econ = rsp.getProvider();
+		return econ != null;
+		
+	}
+	//gets vault economy api
+	public static Economy getEconomy() {
+		return econ;
+	}
+	//gets our silkspawner api
+	public SilkUtil getsu() {
+		return su;
 	}
 	
 	/*
@@ -90,6 +141,33 @@ public class SilkEnhancementMain extends JavaPlugin {
 		tosend = ChatColor.translateAlternateColorCodes('&', tosend);
 		sender.sendMessage(tosend);
 	}
+	//It's the sameas the other sendMessage method, but allows a player object
+	public void sendMessage(Player p, String path) {
+		//If check to make no permission sends easier
+		if(path.equalsIgnoreCase("nopermission")) {
+			path = "messages.nopermission";
+		}
+		String tosend = config.getString(path);
+		tosend = tosend.replace("%prefix%", config.getString("options.prefix"));
+		tosend = tosend.replace("%player%", p.getName());
+		tosend = ChatColor.translateAlternateColorCodes('&', tosend);
+		p.sendMessage(tosend);
+	}
+	//custom message to this plugin, relating to spawners
+	public void sendCustomMessage(Player p, CreatureSpawner spawner, String path, Double cost) {
+		String tosend = config.getString("messages."+path);
+		tosend = tosend.replace("%prefix%", config.getString("options.prefix"));
+		tosend = tosend.replace("%player%", p.getName());
+		tosend = tosend.replace("%type%", spawner.getSpawnedType().toString());
+		tosend = tosend.replace("%balance%", Double.toString(SEVaultMain.getBalance(p)));
+		tosend = tosend.replace("%cost%", Double.toString(cost));
+		if(SEVaultMain.hasEnough(p, cost) == false) {
+			double need = cost - SEVaultMain.getBalance(p);
+			tosend = tosend.replace("", Double.toString(need));
+		}
+		p.sendMessage(color(tosend));
+
+	}
 	//Used to color a given string (change color codes), often used after createmessage EX: inst.color(createmessage(path).replacePlaceholders); 
 	public String color(String tosend) {
 		tosend = ChatColor.translateAlternateColorCodes('&', tosend);
@@ -98,7 +176,7 @@ public class SilkEnhancementMain extends JavaPlugin {
 	//If a message calls for more than one placeholder, we can this method instead to start it off, and then add them
 	public String createMessage(String path) {
 		String tosend = config.getString(path);
-		tosend = tosend.replace("%prefix", config.getString("options.prefix"));
+		tosend = tosend.replace("%prefix%", config.getString("options.prefix"));
 		return tosend;
 	}
 	//Method that extends the capability of creating messages, allowing for a boolean that says if needs to make a non configged message 
@@ -106,11 +184,11 @@ public class SilkEnhancementMain extends JavaPlugin {
 		if(isConfig == false) {
 			String tosend = message;
 			if(config.contains("options.prefix")) {
-				tosend = tosend.replace("%prefix%", config.getString("options.debug"));
+				tosend = tosend.replace("%prefix%", config.getString("options.prefix"));
 			} else {
 				tosend = tosend.replace("%prefix%", "&8(&3Spawners&8)");
 			}
-			return message;
+			return tosend;
 		} else {
 			String tosend = config.getString(message); 
 			return tosend;
@@ -138,17 +216,18 @@ public class SilkEnhancementMain extends JavaPlugin {
 		}
 		if(config.getBoolean("options.resetConfig") == true) {
 			saveResource("config.yml", true);
+			reloadConfig();
 		}
 		//Getting our default configuration
 		InputStream in = getResource("config.yml");
-		InputStreamReader isr = new InputStreamReader(in);
+		Reader isr = new InputStreamReader(in);
 		FileConfiguration defaultConfig = YamlConfiguration.loadConfiguration(isr);
 		//If theres a new version of the config, save it.
 		if(config.contains("version")) {
 			if(config.getDouble("version") != defaultConfig.getDouble("version")) {
 				saveResource("config.yml",true);
 			}
-		} else { //They touched my fish, RESET THE CONFIG!
+		} else { //They touched my fish, RESET THE CONFIG! AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
 			saveResource("config.yml", true);
 		}
 	}
@@ -190,7 +269,6 @@ public class SilkEnhancementMain extends JavaPlugin {
 				//Logging to console, and alerting of the player
 				debug(p.getName() + " - " + message);
 			}
-			
 		}
 	}
 	//Our instance, retrieved from other classes to access our methods
@@ -206,6 +284,11 @@ public class SilkEnhancementMain extends JavaPlugin {
 	public void reloadConfiguration() {
 		if(config.getBoolean("options.resetConfig") == true) {
 			saveResource("config.yml", true);
+		}
+		//If it got somehow deleted, restore it
+		File configFile = new File(getDataFolder().getAbsolutePath()+"/config.yml");
+		if(!configFile.exists()) {
+			saveResource("config.yml",true);
 		}
 		
 		reloadConfig();

@@ -3,11 +3,14 @@ package me.Devee1111.Aliases;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 
 import me.Devee1111.SilkEnhancementMain;
+import me.Devee1111.Sqlite.SqliteMain;
 
 public class AliasesMain {
 
@@ -21,6 +24,233 @@ public class AliasesMain {
 		this.instance = instance;
 	}
 	
+	public static double getCost(String type, Block block, Player p) {
+		double cost = 0;
+		
+		//determing if we're using naturals or not
+		Boolean natural = true;
+		if(SqliteMain.checkData(block) == true) {
+			natural = false;
+		}
+		if(inst.config.getBoolean("options.ignoreNaturalInput") == true) {
+			natural = false;
+		}
+		
+		//Little snare for free ones
+		if((natural == false && inst.config.getBoolean("options.chargeForPlaced") == false)
+		|| (natural == true && inst.config.getBoolean("options.chargeForNatural") == false)) {
+			return cost;
+		}
+		
+		//Getting the path of the prices
+		String pricepath = "options.";
+		if(natural == true) {
+			pricepath = pricepath + "naturalPrices";
+		} else {
+			pricepath = pricepath + "placedPrices";
+		}
+		
+		
+		//We have type, and the area we're going to check analyze!
+		boolean found = false;
+		for(String prices : inst.config.getConfigurationSection(pricepath).getKeys(false)) {
+			if(inst.config.contains("aliases."+type+".names")) {
+				for(String nick : inst.config.getConfigurationSection("aliases."+type+".names").getKeys(false)) {
+					nick = nick.replace("_", " ");
+					if(nick.equalsIgnoreCase(prices)
+						|| nick.replace(" ", "").equalsIgnoreCase(prices)
+					|| nick.replace(" ", "_").equalsIgnoreCase(prices)) {
+						cost = inst.config.getDouble(pricepath+"."+prices);
+						found = true;
+					}
+				}
+			}
+		}
+		
+		//If it gets to this point it's not listed therefore it's unknown! :D
+		if(found == false) {
+			if(inst.config.getBoolean("options.chargeForUnknown.enabled") == true) {
+				if((natural == true)
+				|| (inst.config.getBoolean("options.chargeForUnknown.evenIfPlaced") == true && natural == false)) {
+					cost = inst.config.getDouble("options.chargeForUnknown.price");
+				} 
+			}
+		}
+		
+		//Taking discount into consideration
+		double discount = 0;
+		if((natural == true && inst.config.getBoolean("options.discountForNatural") == true)
+		|| (natural == false && inst.config.getBoolean("options.discountForPlaced") == true)) {
+			//Getting string of permission ready for simplicity 
+			String permission = "se.discount.";
+			if(natural == true) { permission = permission+"natural."; } else { permission = permission + "placed.";}
+			for(int i = 0; i < 100; i++) {
+				if(p.hasPermission(permission+i)) {
+					if(discount  < i) {
+						discount = i;
+					}
+				}
+			}
+			//Checking custom ones
+			for(String node : inst.config.getConfigurationSection("options.discountNodes").getKeys(false)) {
+				if(p.hasPermission("se.discount.custom."+node)) {
+					if(discount < inst.config.getDouble("options.discountNodes.custom."+node)) {
+						discount = inst.config.getDouble("options.discountNodes.custom."+node);
+					}
+				}
+			}
+			if(discount > 100) {
+				discount = 100;
+			}
+			discount = discount/100;
+		}
+		
+		//Now factoring in the actual cost
+		double prediscount = cost * discount;
+		cost = cost - prediscount;
+		
+		//Making sure money isn't gained on mine
+		if(cost < 0) {
+			cost = 0;
+		}
+		
+		//Finally sending the cost
+		return cost;
+	}
+	
+	public static Object getCostObject(String type, Block block, Player p) {
+		double cost = 0;
+		
+		//determing if we're using naturals or not
+		Boolean natural = true;
+		if(SqliteMain.checkData(block) == true) {
+			natural = false;
+		}
+		if(inst.config.getBoolean("options.ignoreNaturalInput") == true) {
+			natural = false;
+		}
+		
+		//Little snare for free ones
+		if((natural == false && inst.config.getBoolean("options.chargeForPlaced") == false)
+		|| (natural == true && inst.config.getBoolean("options.chargeForNatural") == false)) {
+			return cost;
+		}
+		
+		//Getting the path of the prices
+		String pricepath = "options.";
+		if(natural == true) {
+			pricepath = pricepath + "naturalPrices";
+		} else {
+			pricepath = pricepath + "placedPrices";
+		}
+		
+		
+		//We have type, and the area we're going to check analyze!
+		boolean found = false;
+		for(String prices : inst.config.getConfigurationSection(pricepath).getKeys(false)) {
+			for(String nick : inst.config.getConfigurationSection("aliases."+type+".names").getKeys(false)) {
+				nick = nick.replace("_", " ");
+				if(nick.equalsIgnoreCase(prices)
+				|| nick.replace(" ", "").equalsIgnoreCase(prices)
+				|| nick.replace(" ", "_").equalsIgnoreCase(prices)) {
+					cost = inst.config.getDouble(pricepath+"."+prices);
+					found = true;
+				}
+			}
+		}
+		
+		//If it gets to this point it's not listed therefore it's unknown! :D
+		if(found == false) {
+			if(inst.config.getBoolean("options.chargeForUnknown.enabled") == true) {
+				if((natural == true)
+				|| (inst.config.getBoolean("options.chargeForUnknown.evenIfPlaced") == true && natural == false)) {
+					cost = inst.config.getDouble("options.chargeForUnknown.price");
+					return null;
+				} 
+			}
+		}
+		
+		//Taking discount into consideration
+		double discount = 0;
+		if((natural == true && inst.config.getBoolean("options.discountForNatural") == true)
+		|| (natural == false && inst.config.getBoolean("options.discountForPlaced") == true)) {
+			//Getting string of permission ready for simplicity 
+			String permission = "se.discount.";
+			if(natural == true) { permission = permission+"natural."; } else { permission = permission + "placed.";}
+			for(int i = 0; i < 100; i++) {
+				if(p.hasPermission(permission+i)) {
+					if(discount  < i) {
+						discount = i;
+					}
+				}
+			}
+			//Checking custom ones
+			for(String node : inst.config.getConfigurationSection("options.discountNodes").getKeys(false)) {
+				if(p.hasPermission("se.discount.custom."+node)) {
+					if(discount < inst.config.getDouble("options.discountNodes.custom."+node)) {
+						discount = inst.config.getDouble("options.discountNodes.custom."+node);
+					}
+				}
+			}
+			if(discount > 100) {
+				discount = 100;
+			}
+			discount = discount/100;
+		}
+		
+		//Now factoring in the actual cost
+		double prediscount = cost * discount;
+		cost = cost - prediscount;
+		
+		//Making sure money isn't gained on mine
+		if(cost < 0) {
+			cost = 0;
+		}
+		
+		//Finally sending the cost
+		return cost;
+	}
+	
+	@Deprecated
+	/* Stripped down getCost method to check if something is unknown */
+	public static boolean checkUnknown(String type, Block b) {
+		boolean found = false;
+		//determing if we're using naturals or not
+		Boolean natural = true;
+		if(SqliteMain.checkData(b) == true) {
+			natural = false;
+		}
+		if(inst.config.getBoolean("options.ignoreNaturalInput") == true) {
+			natural = false;
+		}
+		//Getting the path of the prices
+		String pricepath = "options.";
+		if(natural == true) {
+			pricepath = pricepath + "naturalPrices";
+		} else {
+			pricepath = pricepath + "placedPrices";
+		}
+		//We have type, and the area we're going to check analyze!
+		for(String prices : inst.config.getConfigurationSection(pricepath).getKeys(false)) {
+			for(String nick : inst.config.getConfigurationSection("aliases."+type+".names").getKeys(false)) {
+				nick = nick.replace("_", " ");
+				if(nick.equalsIgnoreCase(prices)
+				|| nick.replace(" ", "").equalsIgnoreCase(prices)
+				|| nick.replace(" ", "_").equalsIgnoreCase(prices)) {
+					found = true;
+				}
+			}
+		}
+		//If it gets to this point it's not listed therefore it's unknown! :D
+		if(found == false) {
+			if(inst.config.getBoolean("options.chargeForUnknown.enabled") == true) {
+				if((natural == true)
+				|| (inst.config.getBoolean("options.chargeForUnknown.evenIfPlaced") == true && natural == false)) {
+				} 
+			}
+		}
+		return false;
+	}
 	
 	
 	@SuppressWarnings("deprecation")
@@ -64,7 +294,6 @@ public class AliasesMain {
 		return working;
 	}
 	
-	
 	private static void log(String message,CommandSender sender) {
 		//Since this is a questionable as they're testing config add a check
 		String prefix = "&8(&3Spawners&8)";
@@ -87,4 +316,95 @@ public class AliasesMain {
 		
 	}
 	
+} /* Working getcost before I fucked with it
+public static double getCost(String type, Block block, Player p) {
+double cost = 0;
+
+//determing if we're using naturals or not
+Boolean natural = true;
+if(SqliteMain.checkData(block) == true) {
+	natural = false;
 }
+if(inst.config.getBoolean("options.ignoreNaturalInput") == true) {
+	natural = false;
+}
+
+//Little snare for free ones
+if((natural == false && inst.config.getBoolean("options.chargeForPlaced") == false)
+|| (natural == true && inst.config.getBoolean("options.chargeForNatural") == false)) {
+	return cost;
+}
+
+//Getting the path of the prices
+String pricepath = "options.";
+if(natural == true) {
+	pricepath = pricepath + "naturalPrices";
+} else {
+	pricepath = pricepath + "placedPrices";
+}
+
+
+//We have type, and the area we're going to check analyze!
+boolean found = false;
+for(String prices : inst.config.getConfigurationSection(pricepath).getKeys(false)) {
+	for(String nick : inst.config.getConfigurationSection("aliases."+type+".names").getKeys(false)) {
+		nick = nick.replace("_", " ");
+		if(nick.equalsIgnoreCase(prices)
+		|| nick.replace(" ", "").equalsIgnoreCase(prices)
+		|| nick.replace(" ", "_").equalsIgnoreCase(prices)) {
+			cost = inst.config.getDouble(pricepath+"."+prices);
+			found = true;
+		}
+	}
+}
+
+//If it gets to this point it's not listed therefore it's unknown! :D
+if(found == false) {
+	if(inst.config.getBoolean("options.chargeForUnknown.enabled") == true) {
+		if((natural == true)
+		|| (inst.config.getBoolean("options.chargeForUnknown.evenIfPlaced") == true && natural == false)) {
+			cost = inst.config.getDouble("options.chargeForUnknown.price");
+		} 
+	}
+}
+
+//Taking discount into consideration
+double discount = 0;
+if((natural == true && inst.config.getBoolean("options.discountForNatural") == true)
+|| (natural == false && inst.config.getBoolean("options.discountForPlaced") == true)) {
+	//Getting string of permission ready for simplicity 
+	String permission = "se.discount.";
+	if(natural == true) { permission = permission+"natural."; } else { permission = permission + "placed.";}
+	for(int i = 0; i < 100; i++) {
+		if(p.hasPermission(permission+i)) {
+			if(discount  < i) {
+				discount = i;
+			}
+		}
+	}
+	//Checking custom ones
+	for(String node : inst.config.getConfigurationSection("options.discountNodes").getKeys(false)) {
+		if(p.hasPermission("se.discount.custom."+node)) {
+			if(discount < inst.config.getDouble("options.discountNodes.custom."+node)) {
+				discount = inst.config.getDouble("options.discountNodes.custom."+node);
+			}
+		}
+	}
+	if(discount > 100) {
+		discount = 100;
+	}
+	discount = discount/100;
+}
+
+//Now factoring in the actual cost
+double prediscount = cost * discount;
+cost = cost - prediscount;
+
+//Making sure money isn't gained on mine
+if(cost < 0) {
+	cost = 0;
+}
+
+//Finally sending the cost
+return cost;
+}*/

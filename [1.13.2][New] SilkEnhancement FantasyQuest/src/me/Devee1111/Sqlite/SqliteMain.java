@@ -11,6 +11,7 @@ import java.sql.Statement;
 import java.util.logging.Level;
 
 import org.bukkit.block.Block;
+import org.bukkit.block.CreatureSpawner;
 
 import me.Devee1111.SilkEnhancementMain;
 
@@ -103,9 +104,13 @@ public class SqliteMain {
 	/*
 	 * used to add row to our sql database, and stores some additional information for later features.
 	 */
-	public static void addData(Block block,String type,String uuid) {
+	public static void addData(Block block, String uuid) {
 		//Our prepared statement
 		String sql = "INSERT INTO placed(world,x,y,z,type,player) VALUES(?,?,?,?,?,?)";
+		
+		//Preparing type String
+		CreatureSpawner spawner = (CreatureSpawner) block.getState();
+		String type = spawner.getSpawnedType().toString();
 		
 		try {
 			Connection conn = connect();

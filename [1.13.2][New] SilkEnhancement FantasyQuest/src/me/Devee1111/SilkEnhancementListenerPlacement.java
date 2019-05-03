@@ -55,7 +55,7 @@ public class SilkEnhancementListenerPlacement implements Listener {
 		String type = spawner.getSpawnedType().toString();
 		main.debug(type);
 		if(createIndex == true) {
-			SqliteMain.addData(block, type, uuid);
+			SqliteMain.addData(block, uuid);
 		} else {
 			SqliteMain.removeData(block);
 		}

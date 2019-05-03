@@ -18,17 +18,25 @@ options:
     evenIfPlaced: false
   #Do we charge them even if it's placed (Bought)?
   chargeForPlaced: false
-   #If the above is true, do we check and see if they have a discount and give it to them? permission: se.placed.discount.(percentnode) or se.discount.custom.name
+   #If the above is true, do we check and see if they have a discount and give it to them? permission: se.discount.placed.(percentnode) or se.discount.custom.name
   discountForPlaced: false
   #Do we charge for natural spawners being mined?
   chargeForNatural: true
-  #If chargeForNatural is false, do we give them a discount for natural?
+  #If chargeForNatural is true, do we give them a discount for natural?
   discountForNatural: true
+  #Do we just use one set of prices (placedPrices), and not worry about natural / placed spawners?
+  ignoreNaturalInput: false
+  #do we send a message if a spawner is free?
+  sendMessageIfFree: true
+  #Do we send them a message when they're charged for a spawner?
+  sendMessageIfCharged: true
   #These nodes are checked for the player when checking discount, they allow a custom number to be passed in (if it exeeds 100, it will still cost 0)
   #If it's a whole number, normal nodes can do this already.
   discountNodes:
     custom: 33.33
-  #These are the default prices for naturally found spawners, for defualt generations they are: Blaze, Silverfish, Skeleton, Zombie, Spider, Cave_Spider
+  #These are the default prices for naturally found spawners, for defualt generations they are: Blaze, Silverfsh, Skeleton, Zombie, Spider, Cave_Spider
+  #If you have unique world generation, you can put new mobs here, it will know natural as long as the plugin was installed before 
+  #the world was generated. 
   naturalPrices:
     Blaze: 500000
     Skeleton: 80000
@@ -37,6 +45,7 @@ options:
     Spider: 80000
     Cave_Spider: 80000
   #All working mobs listed below 
+  #If we're charging for placed & natural, and ignoreNaturalInput is true, this is what will always be charged
   #Creeper, skeleton, Spider, Zombie, Slime(In chunks only)(Doesn't work with older Holographicdisplay plugins)
   #ghast(Is glitchy often), pigZombie, enderman, cavespider, silverfish, Witch, endermite, guardian, shulker
   #Blaze, Lavaslime(Doesn't work with older Holographicdisplay plugins), bat. 
@@ -55,9 +64,19 @@ messages:
   debugWarning: '%prefix% &cWARNING! &bDebug mode is enabled, this will cause spam. Disable with /sedebug'
   checkFailure: '%prefix% &bAliases &care listed wrong, please check errors.'
   checkSuccess: '%prefix% &bAliases &aare listed correctly.'
+  #Displays message when spawner is mined, and they're charged placeholders: Cost, Type
+  spawnerMined: '%prefix% &bYou''ve mined a &a%type% &bspawner for &a%cost%&b.'
+  #Displays message when spawner is mined and is unknown, and they're charged placeholders: cost
+  spawnerMinedUnkown: '%prefix% &bYou''ve mined an unlisted spawner and have been charged &a%cost%&b.'
+  #Displayed when they don't have enough money Placeholders: Balance, Cost, Need,
+  notEnoughMoney: '%prefix% &bYou do not have enough money for this transaction.'
+  #Mined a spawner for free placeholders: type, balance, 
+  spawnerMinedForFree: '%prefix% &bYou have mined the &a%type% &bspawner for free.'
   
 #Be careful with this section please. It uses the EXACT entity name to produce easier names for mobs
-#MOB NAMES (NOT ALL HAVE SPAWNERS KEEP TH AT IN MIND, BUT IF YOU ADD IT ANYWAYS IT WONT CAUSE ERROR IT WILL JUST NEVER BE SEEN) -https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html 
+#If you've changed it, you can /sereload and then check if it works with /secheck
+#MOB NAMES (NOT ALL HAVE SPAWNERS KEEP TH AT IN MIND, BUT IF YOU ADD IT ANYWAYS IT WONT CAUSE ERROR IT WILL JUST NEVER BE SEEN) -https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html
+#If you're having trouble with mob names, enable debug and hit a mob you're curious about, it will spit out a name for this section. 
 #leave it in all lowercase, the plugin will try to take the name and put it to lowercase for checking  
 #Don't worry about underscores "_" in names section, plugin will replace spaces with _ while checking!
 #Also don't worry about not spaced versioned of the name, the plugin will also try to check with non spaced of names given
@@ -72,14 +91,14 @@ aliases:
     names:
       - 'blaze'
     preferredname: 'Blaze'
-#  CAT:
-#    names:
-#      - 'cat'
-#      - 'kitty'
-#      - 'cade'
-#      - 'kitty kat'
-#      - 'kat'
-#    preferredname: 'Cat'
+  #CAT:
+    #names:
+      #- 'cat'
+      #- 'kitty'
+      #- 'cade'
+      #- 'kitty kat'
+      #- 'kat'
+    #preferredname: 'Cat'
   CAVE_SPIDER:
     names:
       - 'cave spider'
@@ -350,5 +369,4 @@ aliases:
   ZOMBIE_VILLAGER:
     names: 
       - 'zombie villager'
-    preferredname: 'Zombie Villager'
-    
+    preferredname: 'Zombie Villager'    
