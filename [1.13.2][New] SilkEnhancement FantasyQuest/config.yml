@@ -2,6 +2,18 @@
 version: 1.0
 #Configure how the plugin works
 options:
+  #Options for our APIS
+  silk_spawners:
+    #Do you wish for htis plugin to remove some of the spammy features of silkspawners?
+    removeSpam: true
+    #Do you want to remove SilkSpawners messages when spawners are mined and instead display ours?
+    #By default is this is set to false, both plugins mine messages are displayed.
+    removeMessageOnMine: true
+    #DO NOT TOUCH, this is stored if you wish to reenable the messages
+    old_messages:
+      mine: '&2%creature% &espawner broken.'
+      place: '&2%creature% &espawner placed.'
+  #Prefix the plugin uses for messages and the %prefix% placeholder
   prefix: "&8(&3Spawners&8)"
   #If enabled, will log useful information to conosole, if desired you can change the level by adding level: INFO/WARNING/SEVERE
   debug: false
@@ -64,6 +76,10 @@ messages:
   debugWarning: '%prefix% &cWARNING! &bDebug mode is enabled, this will cause spam. Disable with /sedebug'
   checkFailure: '%prefix% &bAliases &care listed wrong, please check errors.'
   checkSuccess: '%prefix% &bAliases &aare listed correctly.'
+  spawnerPlaced:
+    enabled: true
+    #If enabled, displays message when spawner is placed. Placeholders: Type
+    message: '%prefix% &bYou''ve placed a &a%type% &bspawner.'
   #Displays message when spawner is mined, and they're charged placeholders: Cost, Type
   spawnerMined: '%prefix% &bYou''ve mined a &a%type% &bspawner for &a%cost%&b.'
   #Displays message when spawner is mined and is unknown, and they're charged placeholders: cost

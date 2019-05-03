@@ -1,12 +1,15 @@
 package me.Devee1111;
 
 
-import java.io.File;
 //Java imports
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.logging.Level;
+
+import org.bukkit.Bukkit;
 //General bukkit immports
 import org.bukkit.ChatColor;
 import org.bukkit.block.CreatureSpawner;
@@ -35,6 +38,7 @@ public class SilkEnhancementMain extends JavaPlugin {
 	private static SilkEnhancementMain instance;
 	private static Economy econ = null;
 	private static SilkUtil su = null;
+	private boolean returnMessages = false;
 	public FileConfiguration config;
 	
 	@Override
@@ -42,14 +46,15 @@ public class SilkEnhancementMain extends JavaPlugin {
 		//Create instance of our main class for other classes
 		setInstance(this);
 		
+		//Load configuration for use // manages default
+		loadConfig();
+		
 		//Setting our apis
 		if(!setupEconomy()) {
 			getLogger().log(Level.SEVERE,"[SilkEnhancement] Failed to hook into economy! Plugin will now disable.");
 			getServer().getPluginManager().disablePlugin(this);
 		}
 		
-		//Load configuration for use // manages default
-		loadConfig();
 		
 		//Making our Listener classes
 		new SilkEnhancementListenerPlacement(this);
@@ -58,7 +63,7 @@ public class SilkEnhancementMain extends JavaPlugin {
 		
 		//hooking into SilkSpawner api
 		su = SilkUtil.hookIntoSilkSpanwers();
-		
+		setupSilkSpawnerFeatures();
 		//Making our command classes 
 		getCommand("secheck").setExecutor(new SilkEnhancementCommandCheck(this));
 		
@@ -69,7 +74,13 @@ public class SilkEnhancementMain extends JavaPlugin {
 	
 	@Override
 	public void onDisable() {
-		
+		if(returnMessages == true) {
+			File ssLangFile = new File(getDataFolder().getAbsolutePath().replace("/SilkEnhancement", "/SilkSpawners")+"localization.yml");
+			YamlConfiguration ssLang = YamlConfiguration.loadConfiguration(ssLangFile);			
+			ssLang.set("spawnerBroken", config.getString("options.silk_spawners.old_messages.mine"));;
+			ssLang.set("spawnerPlaced", config.getString("options.silk_spawners.old_messages.place"));
+			returnMessages = false; //Not needed but I like it
+		}
 	}
 	
 	//Core commands that are vital to use, therefore are stored on the main thread.	
@@ -116,6 +127,50 @@ public class SilkEnhancementMain extends JavaPlugin {
 		return econ != null;
 		
 	}
+	
+	//Disables features players not like for silkspawners
+	private void setupSilkSpawnerFeatures() {
+		boolean needToReload = false;
+		if(config.getBoolean("options.silk_spawners.removeSpam") == true) {
+			File ssConfigFile = new File(getDataFolder().getAbsolutePath().replace("/SilkEnhancement", "/SilkSpawners")+"/config.yml");
+			YamlConfiguration ssConfig = YamlConfiguration.loadConfiguration(ssConfigFile);
+			//Setting the features that could be considered 'annoying' or glitchy
+			if(ssConfig.get("defaultCreature").equals("90")) {
+				ssConfig.set("defaultCreature","PIG");
+			}
+			ssConfig.set("notifyOnClick", false);
+			ssConfig.set("notifyOnHold", false);
+			ssConfig.set("barAPI.enable", false);
+			ssConfig.set("vanillaBossBar.enable", false);
+			ssConfig.set("verboseConfig",false);
+			//Saving config back to disk
+			try {
+				ssConfig.save(ssConfigFile);
+			} catch (IOException e) {log("Failed to execute removeSpam for SilkSpawners!","SEVERE");}
+			needToReload = true;
+		}
+		
+		if(config.getBoolean("options.silk_spawners.removeSpam") == true) {
+			File ssLangFile = new File(getDataFolder().getAbsolutePath().replace("/SilkEnhancement", "/SilkSpawners")+"/localization.yml");
+			System.out.println("ssLangFilePath = "+getDataFolder().getAbsolutePath().replace("/SilkEnhancement", "/SilkSpawners")+"/localization.yml");
+			YamlConfiguration ssLang = YamlConfiguration.loadConfiguration(ssLangFile);
+			config.set("options.silk_spawners.old_messages.mine", ssLang.getString("spawnerBroken"));
+			ssLang.set("spawnerBroken", "");
+			config.set("options.silk_spawners.old_messages.place", ssLang.getString("spawnerPlaced"));
+			ssLang.set("spawnerPlaced", "");
+			try {
+				ssLang.save(ssLangFile);
+			} catch (IOException e) {log("Failed to execute removeSpam for SilkSpawners!","SEVERE");}
+			returnMessages = true;
+			needToReload = true;
+		}
+		
+		if(needToReload == true) {
+			//Not the best way to do it, but it works for now
+			Bukkit.dispatchCommand(getServer().getConsoleSender(), "ss reload");
+		}
+	}
+	
 	//gets vault economy api
 	public static Economy getEconomy() {
 		return econ;
@@ -158,7 +213,8 @@ public class SilkEnhancementMain extends JavaPlugin {
 		String tosend = config.getString("messages."+path);
 		tosend = tosend.replace("%prefix%", config.getString("options.prefix"));
 		tosend = tosend.replace("%player%", p.getName());
-		tosend = tosend.replace("%type%", spawner.getSpawnedType().toString());
+		String name = config.getString("aliases."+spawner.getSpawnedType().toString()+".preferredname");
+		tosend = tosend.replace("%type%", name);
 		tosend = tosend.replace("%balance%", Double.toString(SEVaultMain.getBalance(p)));
 		tosend = tosend.replace("%cost%", Double.toString(cost));
 		if(SEVaultMain.hasEnough(p, cost) == false) {
@@ -296,6 +352,12 @@ public class SilkEnhancementMain extends JavaPlugin {
 	//This is used to log information to console, for general uses
 	public void log(String message) {
 		getLogger().log(Level.WARNING,message);
+	}
+	//extra option to choose log level
+	public void log(String message, String level) {
+		Level desire = Level.WARNING;
+		desire = Level.parse(level);
+		getLogger().log(desire,message);
 	}
 	/*Not working, causes nullpointerexception when used with others exceptions*/
 	public void error(Exception e) {
