@@ -29,10 +29,10 @@ public class SilkEnhancementListenerSpawners implements Listener {
 	public void onSpawnerPlace(BlockPlaceEvent e) {
 		if(e.getBlock().getType().equals(Material.SPAWNER)) {
 			if(e.isCancelled() == false) {
-				if(inst.config.getBoolean("messages.spawnerPlaced.enabled") == true) {
+				if(inst.config.getBoolean("options.sendMessageOnPlaced") == true) {
 					Player p = e.getPlayer();
 					CreatureSpawner spawner = (CreatureSpawner) e.getBlock().getState();
-					String tosend = inst.createMessage("messages.spawnerPlaced.message");
+					String tosend = inst.createMessage("messages.spawnerPlaced");
 					tosend = tosend.replace("%type%", inst.config.getString("aliases."+spawner.getSpawnedType().toString()+".preferredname"));
 					p.sendMessage(inst.color(tosend));
 				}
@@ -47,15 +47,18 @@ public class SilkEnhancementListenerSpawners implements Listener {
 			if(e.isCancelled() == false) {
 				Player p = e.getPlayer();
 				CreatureSpawner spawner = (CreatureSpawner) e.getBlock().getState();
-				//double cost = AliasesMain.getCost(spawner.getSpawnedType().toString(), e.getBlock(), e.getPlayer());
-				Object o = AliasesMain.getCostObject(spawner.getSpawnedType().toString(), e.getBlock(), e.getPlayer());
-				double cost = Double.parseDouble(o.toString());
-				//Check for unknown maybe?
-				if(o.toString() == null) {
-					inst.sendCustomMessage(p, spawner,"spawnerMinedUnknown",cost);
+				double cost = AliasesMain.getCost(spawner.getSpawnedType().toString(), e.getBlock(), e.getPlayer());
+				//Snares if it's free / unknown
+				if(AliasesMain.isKnown(spawner.getSpawnedType().toString(),e.getBlock(),e.getPlayer()) == false) {
+					if(SEVaultMain.hasEnough(p, cost)) {
+						SEVaultMain.takeMoney(cost, p);
+						inst.sendCustomMessage(p, spawner, "spawnerMinedUnknown", cost);
+					} else {
+						inst.sendCustomMessage(p, spawner, "notEnoughMoney", cost);
+						e.setCancelled(true);
+					}
 					return;
 				}
-				//Snare if it's free
 				if(cost == 0) {
 					if(inst.config.getBoolean("options.sendMessageIfFree") == true) {
 						inst.sendCustomMessage(p, spawner,"spawnerMinedForFree",cost);

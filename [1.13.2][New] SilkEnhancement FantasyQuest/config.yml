@@ -42,6 +42,8 @@ options:
   sendMessageIfFree: true
   #Do we send them a message when they're charged for a spawner?
   sendMessageIfCharged: true
+  #Do we send a message when they place a spawner?
+  sendMessageOnPlaced: true
   #These nodes are checked for the player when checking discount, they allow a custom number to be passed in (if it exeeds 100, it will still cost 0)
   #If it's a whole number, normal nodes can do this already.
   discountNodes:
@@ -76,16 +78,14 @@ messages:
   debugWarning: '%prefix% &cWARNING! &bDebug mode is enabled, this will cause spam. Disable with /sedebug'
   checkFailure: '%prefix% &bAliases &care listed wrong, please check errors.'
   checkSuccess: '%prefix% &bAliases &aare listed correctly.'
-  spawnerPlaced:
-    enabled: true
-    #If enabled, displays message when spawner is placed. Placeholders: Type
-    message: '%prefix% &bYou''ve placed a &a%type% &bspawner.'
+  #If enabled, displays message when spawner is placed. Placeholders: Type
+  spawnerMined: '%prefix% &bYou''ve placed a &a%type% &bspawner.'
   #Displays message when spawner is mined, and they're charged placeholders: Cost, Type
   spawnerMined: '%prefix% &bYou''ve mined a &a%type% &bspawner for &a%cost%&b.'
-  #Displays message when spawner is mined and is unknown, and they're charged placeholders: cost
+  #Displays message when spawner is mined and is unknown, and they're charged placeholders: cost 
   spawnerMinedUnkown: '%prefix% &bYou''ve mined an unlisted spawner and have been charged &a%cost%&b.'
   #Displayed when they don't have enough money Placeholders: Balance, Cost, Need,
-  notEnoughMoney: '%prefix% &bYou do not have enough money for this transaction.'
+  notEnoughMoney: '%prefix% &cYou need &a%cost% &cto perform this action.'
   #Mined a spawner for free placeholders: type, balance, 
   spawnerMinedForFree: '%prefix% &bYou have mined the &a%type% &bspawner for free.'
   

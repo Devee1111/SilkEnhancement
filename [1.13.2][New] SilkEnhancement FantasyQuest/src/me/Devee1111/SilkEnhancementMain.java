@@ -219,7 +219,7 @@ public class SilkEnhancementMain extends JavaPlugin {
 		tosend = tosend.replace("%cost%", Double.toString(cost));
 		if(SEVaultMain.hasEnough(p, cost) == false) {
 			double need = cost - SEVaultMain.getBalance(p);
-			tosend = tosend.replace("", Double.toString(need));
+			tosend = tosend.replace("%need%", Double.toString(need));
 		}
 		p.sendMessage(color(tosend));
 
