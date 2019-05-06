@@ -19,7 +19,6 @@ public class SilkEnhancementCommandReset implements CommandExecutor {
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		
 		if(sender.hasPermission("se.command.reset")) {
 			if(args.length == 1) {
 				for(World w : inst.getServer().getWorlds()) {
@@ -52,10 +51,6 @@ public class SilkEnhancementCommandReset implements CommandExecutor {
 			inst.sendMessage(sender, "nopermission");
 			return true;
 		}
-		
-		
-		
-		return false;
 	}
 	
 
