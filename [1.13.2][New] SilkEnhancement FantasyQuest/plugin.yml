@@ -17,6 +17,10 @@ commands:
     aliases: [check]
     description: Checks if the aliases portion of config is working.
     usage: /<commnad>
+  sereset:
+    aliases: [set]
+    description: Removes a worlds data from the DataBase, used for world resets.
+    usage: /<command>
 permissions:
   se.admin:
     default: op
@@ -24,6 +28,7 @@ permissions:
       se.reload: true
       se.debug: true
       se.command.check: true
+      se.command.reset: true
   se.reload:
     default: op
     description: Access to /sereload
@@ -33,3 +38,6 @@ permissions:
   se.command.check:
     default: op
     description: access to /secheck
+  se.command.reset:
+    default: op
+    description: access to /sereset

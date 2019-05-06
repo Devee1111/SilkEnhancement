@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 
@@ -42,6 +43,26 @@ public class SqliteMain {
 			ex.printStackTrace();
 		}
 		return conn;
+	}
+	
+	public static boolean deleteWorld(World w) {
+		boolean worked = false;
+		String sql = "DELETE FROM placed WHERE world = ?;";
+		try {
+			Connection conn = connect();
+			PreparedStatement stat = conn.prepareStatement(sql);
+			stat.setString(1, w.getName());
+			stat.executeUpdate();
+			stat.close();
+			conn.close();
+			worked = true;
+		} catch(SQLException ex) {
+			inst.getLogger().log(Level.SEVERE, "[SilkEnhancement] Error adjusting the SQL database!");
+			inst.getLogger().log(Level.SEVERE,fatalMessage);
+			ex.printStackTrace();
+		}
+		
+		return worked;
 	}
 	
 	/*

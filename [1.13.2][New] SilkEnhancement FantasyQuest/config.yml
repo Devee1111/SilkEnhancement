@@ -74,6 +74,7 @@ options:
 #Messages displayed throughout the plugin, all messages support the %prefix% placeholder.
 messages:
   nopermission: 'You do not have permission to do this.'
+  wrongArgs: '%prefix$ &cYou have given the wrong args! Try /sehelp!'
   reloadedConfig: '%prefix% &aYou have reloaded the configuration.'
   debugWarning: '%prefix% &cWARNING! &bDebug mode is enabled, this will cause spam. Disable with /sedebug'
   checkFailure: '%prefix% &bAliases &care listed wrong, please check errors.'
@@ -88,6 +89,12 @@ messages:
   notEnoughMoney: '%prefix% &cYou need &a%cost% &cto perform this action.'
   #Mined a spawner for free placeholders: type, balance, 
   spawnerMinedForFree: '%prefix% &bYou have mined the &a%type% &bspawner for free.'
+  #Displayed when a world is deleted from the database Placeholders: World,
+  worldDeleted: '%prefix% &bYou have succsessfully deleted data from world: &a%world%&b.'
+  #Displayed when a world has failed to have its data reset Placeholders: World
+  worldFailedToDelete: '%prefix% &c%world% &bhas failed from being removed from the database.'
+  #Displayed when a sender specified a world that doesn't exist Placeholders: arg
+  worldNotExist: '%prefix% &bworld &c%arg% &bdoes not exist!' 
   
 #Be careful with this section please. It uses the EXACT entity name to produce easier names for mobs
 #If you've changed it, you can /sereload and then check if it works with /secheck

@@ -66,6 +66,7 @@ public class SilkEnhancementMain extends JavaPlugin {
 		setupSilkSpawnerFeatures();
 		//Making our command classes 
 		getCommand("secheck").setExecutor(new SilkEnhancementCommandCheck(this));
+		getCommand("sereset").setExecutor(new SilkEnhancementCommandReset(this));
 		
 		//Getting our SQL ready
 		SqliteMain.loadSqlFile();
